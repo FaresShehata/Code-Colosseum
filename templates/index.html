@@ -5,10 +5,6 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script type="text/javascript" charset="utf-8">
         var socket = io.connect('http://' + document.domain + ':' + location.port);
-
-        var username = prompt("Enter your username:");
-        socket.emit('set_username', {'username': username});
-
         // The rest of the client-side code remains the same
 
         function sendMessage() {

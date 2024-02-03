@@ -25,6 +25,8 @@ def waiting():
 @socketio.on('message_from_client')
 def handle_client_message(message):
     username = users.get(request.sid, 'Unknown User')
+    print(f"Current sid: {request.sid}")
+    print(users)
     text = message['text']
     t = testCase("add", [
         ([1,2],3),
