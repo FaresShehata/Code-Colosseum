@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_socketio import SocketIO, send, emit
 from testCase import testCase
 
@@ -30,6 +30,10 @@ def admin():
 @app.route('/question')
 def waiting():
    return render_template('index.html')
+
+@app.route('/displayResultsPlayer')
+def display_results_player():
+    return render_template('displayResultsPlayer.html')
 
 @socketio.on('message_from_client')
 def handle_client_message(message):
@@ -71,3 +75,4 @@ def display_next_question():
     
 if __name__ == '__main__':
     socketio.run(app, debug=True)
+    

@@ -9,18 +9,27 @@
         var socket = io.connect('http://' + document.domain + ':' + location.port);
         // The rest of the client-side code remains the same
 
-        function sendMessage() {
-            var input = document.getElementById("messageInput");
-            var message = input.value;
-            input.value = ''; // Clear the input field
-            
-            // Send message to server
-            socket.emit('message_from_client', {'username': 'User', 'text': message});
-        }
+        // function sendMessage() {
+        //     var input = document.getElementById("messageInput");
+        //     var message = input.value;
+        //     input.value = ''; // Clear the input field
+
+        //     // Send message to server
+        //     socket.emit('message_from_client', {'username': 'User', 'text': message});
+        // }
 
         socket.on('present_question', function(msg) {
             var messages = document.getElementById("messages");
             messages.innerHTML += ('<p><b>' + msg.username + ':</b> ' + msg.text + '</p>');
+        });
+        socket.on("display_round_results", function(data) {
+            //TODO display how the user did on this particular question here
+        })
+        socket.on("display_results", function(data) {
+            //localStorage["socket"] = JSON.stringify(socket);
+            localStorage["results"] = data; 
+            localStorage["username"] = username;     
+            window.location.href = "/displayResultsPlayer";
         });
     </script>
     
