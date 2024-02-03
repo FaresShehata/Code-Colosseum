@@ -24,6 +24,9 @@
             var messages = document.getElementById("messages");
             messages.innerHTML += ('<p><b>' + msg.username + ':</b> ' + msg.text + '</p>');
         });
+        socket.on("display_round_results", function(data) {
+            //TODO display how the user did on this particular question here
+        })
         socket.on("display_results", function(data) {
             //localStorage["socket"] = JSON.stringify(socket);
             localStorage["results"] = data; 
