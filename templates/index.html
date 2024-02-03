@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Real-time Chat</title>
-    <link href="styles/index1.css" rel="stylesheet">
+    <link href="{{ url_for('static',filename='styles/index1.css') }}" rel="stylesheet">
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script type="text/javascript" charset="utf-8">
         var socket = io.connect('http://' + document.domain + ':' + location.port);
@@ -28,9 +28,20 @@
     </script>
 </head>
 <body>
-    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl underline items-center">Real-time Chat</h2>
-    <div id="messages" style="margin-bottom: 20px;"></div>
-    <input type="text" id="messageInput" placeholder="Type your message here...">
-    <button onclick="sendMessage()">Send</button>
+    
+    <div class="flex flex-col justify-center min-h-screen bg-gray-50 py-6 sm:py-12 w-fill">
+        <div class="relative bg-white rounded-lg shadow-xl ring-1 ring-gray-900/5 mx-auto max-w-lg px-6 pt-10 pb-8 sm:px-10 space-y-6 text-base leading-7 text-gray-600 md:w-3/4">
+          <h2 class="center text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Question:</h2>
+          <div id="messages" class="mb-20"></div>
+          <div>
+            <label for="code" class="block text-sm font-medium leading-6 text-gray-900">Enter your code below</label>
+            <div class="relative mt-2 rounded-md shadow-sm">
+              <textarea type="text" name="code" id="messageInput" class="block w-full rounded-md border-1 py-1 pl-2 pr-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Code here"></textarea>
+            </div>
+            <button onclick="sendMessage()" class="mt-4 px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Send</button>
+          </div>
+        </div>
+      </div>
+      
 </body>
 </html>
