@@ -1,19 +1,29 @@
-from flask import Flask, request
-from src.logic import execute_code
+from flask import Flask, render_template, request
+from flask_socketio import SocketIO, send, emit
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 
-@app.route('/', methods=['GET', 'POST'])
-def home():
-    if request.method == 'POST':
-        code = request.form.get('code_box')
-        result = execute_code(code)
-        return result
-    return '''<form method="POST">
-                  Code to execute: <br>
-                  <input type="text" name="code_box" /><br>
-                  <input type="submit" value="Execute" /><br>
-              </form>'''
+users = {}
 
-if __name__  == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@socketio.on('message_from_client')
+def handle_client_message(message):
+    username = users.get(request.sid, 'Unknown User')
+    text = message['text']
+    print(f'Message from {username}: {text}')
+    # Broadcast the received message with the username
+    emit('message_from_server', {'username': username, 'text': text}, broadcast=True)
+
+@socketio.on('set_username')
+def handle_set_username(data):
+    username = data['username']
+    users[request.sid] = username
+
+
+if __name__ == '__main__':
+    socketio.run(app, debug=True)
