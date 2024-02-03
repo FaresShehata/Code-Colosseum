@@ -6,16 +6,25 @@
         var socket = io.connect('http://' + document.domain + ':' + location.port);
         // Set username as admin to indicate 
         socket.emit('set_username', {'username': "admin"});
+        function generateGameCode(){
+            const randomNumber = Math.floor(100000 + Math.random() * 900000);
+            randomNumber = randomNumber.toString().padStart(6, '0');
+            document.getElementById("game_code").innerHTML += randomNumber;
+            socket.emit("set_game_code", {"game_code": randomNumber});
+        }
+        function startGame(){
+            socket.emit("start_game", {});
+        }
     </script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Host Game</title>
 </head>
-<body>
+<body onload="generateGameCode()">
+    <h1 id="game_code">Game Code:</h1>
 
 
-
-
+    <button onclick="startGame()">Start the game</button>
 </body>
 </html>

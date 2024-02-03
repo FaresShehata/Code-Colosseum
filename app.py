@@ -6,6 +6,8 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
 users = {}
+game_code = None
+responses = {}
 
 @app.route('/')
 def index():
@@ -24,6 +26,25 @@ def handle_set_username(data):
     username = data['username']
     users[request.sid] = username
 
+@socketio.on("set_game_code")
+def handle_set_game_code(data):
+    game_code = data["game_code"]
+    # Wait for the host to start the game
+    # TODO start the game
 
+@socketio.on("start_game")
+def handle_start_game(data):
+    # Start displaying questions
+    responses = users.copy()
+    for key in responses:
+        responses[key] = None
+    display_next_question()
+
+def display_next_question():
+    question = ""
+    # TODO get the question
+    # Emit the question to all clients
+    socketio.broadcast.emit("new_question", question)
+    
 if __name__ == '__main__':
     socketio.run(app, debug=True)
