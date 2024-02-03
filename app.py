@@ -30,8 +30,9 @@ def handle_client_message(message):
     t = questions[1]
     t.code = text
 
-    res = t.returnMessage()
-    print(f'Message from {username}: {res}')
+    res = str(t.returnMessage())
+    print(f'Message from {username}: {text}')
+    print(f'Output: {res}')
     # Broadcast the received message with the username
     emit('present_question', {'username': username, 'text': res}, room=request.sid)
 

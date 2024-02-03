@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Real-time Chat</title>
+    <title>Code-it!</title>
+    <link href="{{ url_for('static',filename='styles/index.css') }}" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script type="text/javascript" charset="utf-8">
         var socket = io.connect('http://' + document.domain + ':' + location.port);
@@ -9,25 +11,55 @@
         var username = prompt("Enter your username:");
         socket.emit('set_username', {'username': username});
 
-        function sendMessage() {
-            var input = document.getElementById("messageInput");
-            var message = input.value;
-            input.value = ''; // Clear the input field
-            
-            // Send message to server
-            socket.emit('message_from_client', {'username': 'User', 'text': message});
-        }
 
         socket.on('present_question', function(msg) {
             var messages = document.getElementById("messages");
             messages.innerHTML += ('<p><b>' + msg.username + ':</b> ' + msg.text + '</p>');
         });
     </script>
+    
 </head>
 <body>
-    <h2>Real-time Chat</h2>
-    <div id="messages" style="margin-bottom: 20px;"></div>
-    <textarea name="code input" rows="4" cols="50" id="messageInput"></textarea>
-    <button onclick="sendMessage()">Send</button>
+
+
+    
+
+
+    <div class="flex flex-col justify-center min-h-screen bg-gray-50 py-6 sm:py-12 w-fill">
+        <div class="relative bg-white rounded-lg shadow-xl ring-1 ring-gray-900/5 mx-auto max-w-lg px-6 pt-10 pb-8 sm:px-10 space-y-6 text-base leading-7 text-gray-600 md:w-3/4">
+          <h2 class="center text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Question:</h2>
+          <div id="messages" class="mb-20"></div>
+          <div>
+            <label for="code" class="block text-sm font-medium leading-6 text-gray-900">Enter your code below</label>
+            <div class="relative mt-2 rounded-md shadow-sm">
+                <div id="editor" style="height: 300px;"></div>
+            </div>
+        
+            <button onclick="sendMessage()" class="mt-4 px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <script type="text/javascript" charset="utf-8">// Initialize ACE Editor
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai"); // Set editor theme
+        editor.session.setMode("ace/mode/python"); // Set language mode
+        editor.session.setUseWrapMode(true);
+        editor.setHighlightActiveLine(false);
+        // Add event listener for changes in the editor
+        editor.getSession().on('change', function() {
+            var code = editor.getValue();
+        });
+        
+        function sendMessage() {
+            var input = editor.getValue();
+            var message = input;
+            editor.setValue(""); // Clear the input field
+            
+            // Send message to server
+            socket.emit('message_from_client', {'username': 'User', 'text': input});
+        }
+        
+        </script>
 </body>
 </html>
