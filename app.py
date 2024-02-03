@@ -24,7 +24,7 @@ def handle_client_message(message):
     res = t.returnMessage()
     print(f'Message from {username}: {res}')
     # Broadcast the received message with the username
-    emit('present_question', {'username': username, 'text': res}, broadcast=True)
+    emit('present_question', {'username': username, 'text': res}, room=request.sid)
 
 @socketio.on('set_username')
 def handle_set_username(data):
