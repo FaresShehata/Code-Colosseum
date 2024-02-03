@@ -12,11 +12,15 @@ responses = {}
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('waiting.html')
 
 @app.route('/admin')
 def admin():
     return render_template('host.html')
+
+@app.route('/question')
+def waiting():
+   return render_template('index.html')
 
 @socketio.on('message_from_client')
 def handle_client_message(message):
@@ -49,10 +53,7 @@ def handle_set_game_code(data):
 @socketio.on("start_game")
 def handle_start_game():
     # Display question for all players.
-    responses = users.copy()
-    for key in responses:
-        responses[key] = None
-    display_next_question()
+    emit('redirect_to_question', {'url': '/question'}, broadcast=True)
 
 def display_next_question():
     question = ""
