@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Results</title>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.emit('set_username', {'username': localStorage["username"]});
+
+        function displayResults(){
+            // Here the results need to be properly rendered
+            document.getElementById("results").innerHTML = localStorage["results"];
+        }
+        // The rest of the client-side code remains the same
+       
+        socket.on('present_question', function(msg) {
+            var messages = document.getElementById("messages");
+            messages.innerHTML += ('<p><b>' + msg.username + ':</b> ' + msg.text + '</p>');
+        });
+    </script>
+</head>
+<body onload="displayResults()">
+    <h1>The results</h1>
+    <div id="results"></div>
+</body>
+</html>
