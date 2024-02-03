@@ -7,8 +7,9 @@
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
         var username = prompt("Enter your username:");
-        socket.emit('set_username', {'username': username});
-
+        if (username) {
+          socket.emit('set_username', {'username': username});
+        }
         // The rest of the client-side code remains the same
 
         function sendMessage() {
