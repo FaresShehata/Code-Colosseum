@@ -10,6 +10,15 @@ users = {}
 game_code = None
 responses = {}
 
+questions = [
+    testCase("add", [
+        ([1,2],3)
+    ], description="make a function 'add' to add 2 numbers"),
+    testCase("factorial", [
+        [[5],120], [[6],720]
+    ], description="write a function 'factorial' to calculate the facotrial of a number")
+]
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -18,10 +27,8 @@ def index():
 def handle_client_message(message):
     username = users.get(request.sid, 'Unknown User')
     text = message['text']
-    t = testCase("add", [
-        ([1,2],3),
-        ([-1,-2],-3)
-    ], text)
+    t = questions[1]
+    t.code = text
 
     res = t.returnMessage()
     print(f'Message from {username}: {res}')

@@ -9,8 +9,6 @@
         var username = prompt("Enter your username:");
         socket.emit('set_username', {'username': username});
 
-        // The rest of the client-side code remains the same
-
         function sendMessage() {
             var input = document.getElementById("messageInput");
             var message = input.value;
@@ -29,7 +27,7 @@
 <body>
     <h2>Real-time Chat</h2>
     <div id="messages" style="margin-bottom: 20px;"></div>
-    <input type="text" id="messageInput" placeholder="Type your message here...">
+    <textarea name="code input" rows="4" cols="50" id="messageInput"></textarea>
     <button onclick="sendMessage()">Send</button>
 </body>
 </html>
