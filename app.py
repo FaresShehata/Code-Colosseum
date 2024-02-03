@@ -1,9 +1,19 @@
-from flask import Flask
+from flask import Flask, request
+from src.logic import execute_code
+
 app = Flask(__name__)
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    if request.method == 'POST':
+        code = request.form.get('code_box')
+        result = execute_code(code)
+        return result
+    return '''<form method="POST">
+                  Code to execute: <br>
+                  <input type="text" name="code_box" /><br>
+                  <input type="submit" value="Execute" /><br>
+              </form>'''
 
 if __name__ == '__main__':
     app.run(debug=True)
