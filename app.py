@@ -21,7 +21,15 @@ questions = [
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('waiting.html')
+
+@app.route('/admin')
+def admin():
+    return render_template('host.html')
+
+@app.route('/question')
+def waiting():
+   return render_template('index.html')
 
 @socketio.on('message_from_client')
 def handle_client_message(message):
@@ -39,7 +47,10 @@ def handle_client_message(message):
 @socketio.on('set_username')
 def handle_set_username(data):
     username = data['username']
-    users[request.sid] = username
+    if username == "admin":
+        emit('redirect_to_admin', {'url': '/admin'})
+    else:
+        users[request.sid] = username
 
 @socketio.on("set_game_code")
 def handle_set_game_code(data):
@@ -48,12 +59,9 @@ def handle_set_game_code(data):
     # TODO start the game
 
 @socketio.on("start_game")
-def handle_start_game(data):
-    # Start displaying questions
-    responses = users.copy()
-    for key in responses:
-        responses[key] = None
-    display_next_question()
+def handle_start_game():
+    # Display question for all players.
+    emit('redirect_to_question', {'url': '/question'}, broadcast=True)
 
 def display_next_question():
     question = ""

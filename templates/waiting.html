@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Waiting</title>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        var username = prompt("Enter your username:");
+        socket.emit('set_username', {'username': username});
+
+        socket.on('redirect_to_admin', function(data) {
+            // Redirect the client to the specified URL
+            window.location.href = data.url;
+        });
+
+        socket.on('redirect_to_question', function(data) {
+          window.location.href = data.url;
+        });
+    </script>
+</head>
+<body>
+    <h1>Waiting for host to start the game...</h1>
+</body>
+</html>
