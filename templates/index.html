@@ -24,6 +24,11 @@
             var messages = document.getElementById("messages");
             messages.innerHTML += ('<p><b>' + msg.username + ':</b> ' + msg.text + '</p>');
         });
+
+        socket.on('redirect_to_admin', function(data) {
+            // Redirect the client to the specified URL
+            window.location.href = data.url;
+        });
     </script>
 </head>
 <body>

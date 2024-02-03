@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO, send, emit
-from testCase import testCase
+from src.testCase import testCase
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -13,6 +13,10 @@ responses = {}
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/admin')
+def admin():
+    return render_template('host.html')
 
 @socketio.on('message_from_client')
 def handle_client_message(message):
@@ -31,7 +35,10 @@ def handle_client_message(message):
 @socketio.on('set_username')
 def handle_set_username(data):
     username = data['username']
-    users[request.sid] = username
+    if username == "admin":
+        emit('redirect_to_admin', {'url': '/admin'})
+    else:
+        users[request.sid] = username
 
 @socketio.on("set_game_code")
 def handle_set_game_code(data):
