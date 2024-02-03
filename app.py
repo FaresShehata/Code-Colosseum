@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for
-from flask_socketio import SocketIO, send, emit
+from flask import Flask, render_template, request
+from flask_socketio import SocketIO, emit
 from src.testCase import testCase
 
 app = Flask(__name__)
@@ -47,8 +47,8 @@ def handle_set_game_code(data):
     # TODO start the game
 
 @socketio.on("start_game")
-def handle_start_game(data):
-    # Start displaying questions
+def handle_start_game():
+    # Display question for all players.
     responses = users.copy()
     for key in responses:
         responses[key] = None
