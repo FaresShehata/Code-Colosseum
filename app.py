@@ -7,6 +7,7 @@ users = {}
 responses = {}
 received_responses = [0]
 timingThread = [None]
+results = {}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -47,8 +48,8 @@ def handle_client_message(data):
     print(f'Output: {res}')
     responses[data["uuid"]] = res
     received_responses[0] += 1
-    print(received_responses[0], len(users))
-    if received_responses[0] >= len(users):
+    required_responses = 2
+    if received_responses[0] >= required_responses:
         handle_question_end()
     # Broadcast the received message with the username
     #emit('present_question', {'username': username, 'text': res})
@@ -58,6 +59,9 @@ def handle_connection():
     
 @socketio.on('set_username')
 def handle_set_username(data):
+    # Add the user to the results data structure
+    if data["uuid"] not in results:
+        results[data["uuid"]] = []
     # print("--------------------", request.sid)
     id = request.sid
     #print("++++++++++++++", request.namespace.socket.sessid)
@@ -96,9 +100,9 @@ def display_next_question():
     # Emit the question to all clients
     emit("new_question", question, broadcast=True)
     # Start the timer
-    question_time = 60 * 5
-    timingThread[0] = Timer(question_time, handle_question_end)
-    timingThread[0].start()
+    # question_time = 60 * 5
+    # timingThread[0] = Timer(question_time, handle_question_end)
+    # timingThread[0].start()
 
 # Handles when all responses have been received or timeout occurs
 def handle_question_end():
