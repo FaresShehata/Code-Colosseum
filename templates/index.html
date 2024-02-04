@@ -49,7 +49,8 @@
           <div>
             <label for="code" class="block text-sm font-medium leading-6 text-gray-900">Enter your code below</label>
             <div class="relative mt-2 rounded-md shadow-sm">
-                <div id="editor" style="height: 300px;"></div>
+                <div id="editor"></div>
+   
             </div>
         
             <button onclick="sendMessage()" class="mt-4 px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Send</button>
@@ -74,7 +75,12 @@
             
             var input = editor.getValue();
             var message = input;
-            editor.setValue(""); // Clear the input field
+            editor.destroy();
+            editor.container.remove();// Clear the input field
+
+            Document.write("<div id='loader'></div>"); // Clear the input field
+
+
             
             // Send message to server
             socket.emit('message_from_client', {'username': 'User', 'text': input});
