@@ -36,11 +36,11 @@
     
 </head>
 <body>
-    <div class="card">
+    <div id="card" class="card">
             <div class="text">Let's Code</div>
             <div class="bg"></div>
             <div class="blob" id="blob"></div>
-        </div>
+    </div>
 
     <div class="flex flex-col justify-center min-h-screen bg-gray-50 py-6 sm:py-12 w-fill">
         <div class="relative bg-white rounded-lg shadow-xl ring-1 ring-gray-900/5 mx-auto max-w-lg px-6 pt-10 pb-8 sm:px-10 space-y-6 text-base leading-7 text-gray-600 md:w-3/4">
@@ -49,10 +49,12 @@
           <div>
             <label for="code" class="block text-sm font-medium leading-6 text-gray-900">Enter your code below</label>
             <div class="relative mt-2 rounded-md shadow-sm">
+                <div id="block">
                 <div id="editor" style="height: 300px;"></div>
-            </div>
+                </div>
+                </div>
         
-            <button onclick="sendMessage()" class="mt-4 px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Send</button>
+            <button id="button" onclick="sendMessage()" class="mt-4 px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Send</button>
           </div>
         </div>
       </div>
@@ -71,13 +73,26 @@
         function sendMessage() {
             var blob = document.getElementById('blob');
             blob.style.animationPlayState = 'paused';
+            document.getElementById('card').remove();
             
             var input = editor.getValue();
             var message = input;
-            editor.setValue(""); // Clear the input field
+            editor.destroy();
+            editor.container.remove();
+
+            // Clear the input field
             
             // Send message to server
             socket.emit('message_from_client', {'username': 'User', 'text': input});
+            
+            var loaderDiv = document.createElement('div');
+            loaderDiv.setAttribute('id', 'loader');
+
+            var coderDiv = document.getElementById('block');
+            coderDiv.appendChild(loaderDiv);
+
+            var button = document.getElementById('button');
+            button.disabled = true;
         }
         
         </script>
