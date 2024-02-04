@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, request
 from flask_socketio import SocketIO, send, emit
 from src.testCase import testCase
 from threading import Timer
+from random import randint
 
 users = {}
 wait_for_this_many_users = 2
@@ -13,6 +14,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
+yes = [100, 50, 32, 87, 42]
+
 questions = [
     testCase("add", [
         ([1, 2], 3)
@@ -20,15 +23,15 @@ questions = [
     testCase("factorial", [
         ([5], 120), ([6], 720)
     ], description="write a function 'factorial' to calculate the factorial of a number"),
-    testCase("sum_array", [
-        ([1, 2, 3, 4, 5], 15), ([10, 20, 30], 60)
-    ], description="write a function 'sum_array' that returns the sum of all elements in an array"),
-    testCase("is_prime", [
-        ([2], True), ([4], False), ([11], True)
-    ], description="write a function 'is_prime' to check if a number is prime"),
-    testCase("fibonacci", [
-        ([5], 5), ([7], 13)
-    ], description="write a function 'fibonacci' that returns the nth number in the Fibonacci sequence")
+    # testCase("sum_array", [
+    #     ([1, 2, 3, 4, 5], 15), ([10, 20, 30], 60)
+    # ], description="write a function 'sum_array' that returns the sum of all elements in an array"),
+    # testCase("is_prime", [
+    #     ([2], True), ([4], False), ([11], True)
+    # ], description="write a function 'is_prime' to check if a number is prime"),
+    # testCase("fibonacci", [
+    #     ([5], 5), ([7], 13)
+    # ], description="write a function 'fibonacci' that returns the nth number in the Fibonacci sequence")
 ]
 
 responses: list[dict[str, str]] = [{} for _ in range(len(questions))]
@@ -47,15 +50,17 @@ def waiting():
 
 @app.route('/displayResultsPlayer')
 def display_results_player():
-    return render_template('displayResultsPlayer.html')
+    names = "".join([f"{n[0]}\n" for n in users.values()])
+    # data = {"labels":[f"{n[0]}" for n in users.values()],
+    #         "values":[e["percentage"] 
+    #                     for r in responses
+    #                     for e in r.values()]}
+    data = {"labels": [f"{n[0]}" for n in users.values()], "values": [yes[i % len(yes)] for i in range(len(users))]}
 
-@app.route('/displayResultsAdmin')
-def display_results_admin():
-    return render_template('displayResultsAdmin.html')
+    return render_template('displayResultsPlayer.html', names=names, data=data)
 
 def end():
     emit('end', {"url": "/displayResultsPlayer"}, broadcast=True)
-    emit("end_admin", {"url": "/displayResultsAdmin"}, broadcast=True)
 
 @socketio.on('message_from_client')
 def handle_client_message(data):
@@ -69,6 +74,7 @@ def handle_client_message(data):
     responses[current_question][users[data["uuid"]][1]] = res
 
     if len(responses[current_question]) == len(users):
+        print(f"{responses = }")
         handle_question_end()
     # Broadcast the received message with the username
     #emit('present_question', {'username': username, 'text': res})

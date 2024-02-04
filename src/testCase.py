@@ -59,4 +59,4 @@ except Exception as e:
             print(ee)
             loc["ret"] = self.getFailedMessage()
         
-        return loc
+        return {"ret": loc["ret"], "percentage": loc.get("percentage", 0)}

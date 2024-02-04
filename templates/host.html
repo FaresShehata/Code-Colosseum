@@ -8,7 +8,7 @@
         function startGame(){
             socket.emit("start_game");
         }
-        socket.on("end_admin", function(data) {
+        socket.on("end", function(data) {
             window.location.href = data.url;
         })
     </script>
