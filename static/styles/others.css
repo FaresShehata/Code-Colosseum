@@ -1,0 +1,118 @@
+#editor {
+    width: 100%;
+    border: 1px solid #EEEEEE;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+#bounce {
+    position: relative;
+    animation: bounce 1s infinite;
+  }
+
+  @keyframes bounce {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  .card {
+    position: relative;
+    top: 50px; /* Adjust top position as needed */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%);
+    width: 150px; /* Set width to 150px */
+    height: 50px; /* Set height to 50px */
+    border-radius: 14px;
+    z-index: 1111;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+    transition: top 0.3s ease;
+  }
+  
+  .text {
+    position: relative;
+    font-size: 16px; /* Adjust font size as needed */
+    color: black; /* Adjust text color as needed */
+    z-index: 3;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font: bold;
+  }  
+  
+  .bg {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 140px; /* Adjust width to fit the resized card */
+    height: 40px; /* Adjust height to fit the resized card */
+    z-index: 2;
+    background: rgba(255, 255, 255, .95);
+    backdrop-filter: blur(24px);
+    border-radius: 10px;
+    overflow: hidden;
+    outline: 2px solid white;
+  }
+  
+  .blob {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    width: 70px; /* Adjust width to fit the resized card */
+    height: 70px; /* Adjust height to fit the resized card */
+    border-radius: 50%;
+    background-color: green;
+    opacity: 1;
+    filter: blur(12px);
+    animation: blob-bounce 5s infinite ease;
+  }
+
+@keyframes blob-bounce {
+  0% {
+    transform: translate(-100%, -100%) translate3d(0, 0, 0);
+  }
+
+  25% {
+    transform: translate(-100%, -100%) translate3d(100%, 0, 0);
+  }
+
+  50% {
+    transform: translate(-100%, -100%) translate3d(100%, 100%, 0);
+  }
+
+  75% {
+    transform: translate(-100%, -100%) translate3d(0, 100%, 0);
+  }
+
+  100% {
+    transform: translate(-100%, -100%) translate3d(0, 0, 0);
+  }
+}
+
+
+#loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #343fdb; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+  position: relative;
+  margin-left: 150px;
+  margin-bottom: 100px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
