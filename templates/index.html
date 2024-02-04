@@ -15,7 +15,7 @@
             input.value = ''; // Clear the input field
 
             // Send message to server
-            socket.emit('message_from_client', {'username': sessionStorage.getItem('username'), 'text': message});
+            socket.emit('message_from_client', {'sid': socket.id, 'answer': message});
         }
 
         socket.on('present_question', function(msg) {

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect
 from flask_socketio import SocketIO, send, emit
 from testCase import testCase
+from threading import Timer
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -9,7 +10,7 @@ socketio = SocketIO(app)
 users = {}
 game_code = None
 responses = {}
-
+timingThread = None
 questions = [
     testCase("add", [
         ([1,2],3)
@@ -34,6 +35,8 @@ def waiting():
 @app.route('/displayResultsPlayer')
 def display_results_player():
     return render_template('displayResultsPlayer.html')
+
+
 
 @socketio.on('message_from_client')
 def handle_client_message(message):
@@ -82,7 +85,13 @@ def display_next_question():
     # TODO get the question
     # Emit the question to all clients
     socketio.broadcast.emit("new_question", question)
-    
+    # Start the timer
+    question_time = 60 
+    timingThread = threading.Timer(question_time, on_response_timeout)
+
+def on_response_timeout():
+    pass
+
 if __name__ == '__main__':
     socketio.run(app, debug=True)
     
