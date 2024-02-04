@@ -8,14 +8,6 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script type="text/javascript" charset="utf-8">
         var socket = io.connect('http://' + document.domain + ':' + location.port);
-        //var oldsid = sessionStorage["oldsid"];
-        
-        var sid = ""
-        // socket.on('connect', () => {
-        //     //get the id from socket
-        //     sid = socket.id;
-        // });
-   
 
         socket.emit("update_connection", {"uuid": sessionStorage["uuid"]});
         // The rest of the client-side code remains the same
@@ -50,7 +42,7 @@
 
     <div class="flex flex-col justify-center min-h-screen bg-gray-50 py-6 sm:py-12 w-fill">
         <div class="relative bg-white rounded-lg shadow-xl ring-1 ring-gray-900/5 mx-auto max-w-lg px-6 pt-10 pb-8 sm:px-10 space-y-6 text-base leading-7 text-gray-600 md:w-3/4">
-          <h2 id="ask" class="center text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Question:</h2>
+          <h2 id="ask" class="center text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Question: {{first_question}}</h2>
           <div id="messages" class="mb-20"></div>
           <div>
             <label id="prompt" for="code" class="block text-sm font-medium leading-6 text-gray-900">Enter your code below</label>

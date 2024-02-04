@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, request
 from flask_socketio import SocketIO, send, emit
-from testCase import testCase
+from src.testCase import testCase
 from threading import Timer
 
 users = {}
 responses = {}
-received_responses = [0]
-timingThread = [None]
+wait_for_this_many_users = 2
+current_question = 0
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -18,7 +18,7 @@ questions = [
     ], description="make a function 'add' to add 2 numbers"),
     testCase("factorial", [
         [[5],120], [[6],720]
-    ], description="write a function 'factorial' to calculate the facotrial of a number")
+    ], description="write a function 'factorial' to calculate the factorial of a number")
 ]
 
 @app.route('/')
@@ -31,7 +31,7 @@ def admin():
 
 @app.route('/question')
 def waiting():
-   return render_template('index.html')
+   return render_template('index.html', first_question = questions[current_question].description)
 
 @app.route('/displayResultsPlayer')
 def display_results_player():
@@ -39,16 +39,15 @@ def display_results_player():
 
 @socketio.on('message_from_client')
 def handle_client_message(data):
-    t = questions[1]
+    t = questions[current_question]
     t.code = data["answer"]
 
-    res = str(t.returnMessage())
+    res = t.returnMessage()
     print(f'Message from {users[data["uuid"]][0]}: {data["answer"]}')
-    print(f'Output: {res}')
-    responses[data["uuid"]] = res
-    received_responses[0] += 1
-    print(received_responses[0], len(users))
-    if received_responses[0] >= len(users):
+    print(f'Output: {res["ret"]}')
+    responses[users[data["uuid"]][0]] = res
+
+    if len(responses) == wait_for_this_many_users:
         handle_question_end()
     # Broadcast the received message with the username
     #emit('present_question', {'username': username, 'text': res})
@@ -91,24 +90,18 @@ def display_next_question():
     question = ""
     for key in responses:
         responses[key] = None
-    received_responses = 0
     # TODO get the question
     # Emit the question to all clients
     emit("new_question", question, broadcast=True)
-    # Start the timer
-    question_time = 60 * 5
-    timingThread[0] = Timer(question_time, handle_question_end)
-    timingThread[0].start()
 
 # Handles when all responses have been received or timeout occurs
 def handle_question_end():
-    if timingThread[0] is not None: 
-        timingThread[0].cancel()
-    # Send the feedback to all the users
-    for key in responses:
-        emit("receive_feedback", responses[key], to=users[key][1])
-    # Next question
-    display_next_question()
+    # # Send the feedback to all the users
+    # for key in responses:
+    #     emit("receive_feedback", responses[key], to=users[key][1])
+    # # Next question
+    # display_next_question()
+    print("Everyone has responded with their shit.")
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
