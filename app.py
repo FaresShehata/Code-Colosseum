@@ -7,7 +7,6 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
 users = {}
-game_code = None
 responses = {}
 
 questions = [
@@ -37,7 +36,8 @@ def display_results_player():
 
 @socketio.on('message_from_client')
 def handle_client_message(message):
-    username = users.get(request.sid, 'Unknown User')
+    # username = users.get(request.sid, 'Unknown User')
+    username = message['username']
     text = message['text']
     t = questions[1]
     t.code = text
@@ -45,22 +45,17 @@ def handle_client_message(message):
     res = str(t.returnMessage())
     print(f'Message from {username}: {text}')
     print(f'Output: {res}')
-    # Broadcast the received message with the username
-    emit('present_question', {'username': username, 'text': res}, room=request.sid)
+    responses[request.sid] = res
+    if len(responses) == 2:
+        # Send the received message with the username
+        for sid in responses:
+            emit('present_question', {'text': responses[sid]}, to=sid)
 
 @socketio.on('set_username')
 def handle_set_username(data):
     username = data['username']
     if username == "admin":
         emit('redirect_to_admin', {'url': '/admin'})
-    else:
-        users[request.sid] = username
-
-@socketio.on("set_game_code")
-def handle_set_game_code(data):
-    game_code = data["game_code"]
-    # Wait for the host to start the game
-    # TODO start the game
 
 @socketio.on("start_game")
 def handle_start_game():
