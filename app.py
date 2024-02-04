@@ -52,11 +52,16 @@ def handle_client_message(message):
 @socketio.on('set_username')
 def handle_set_username(data):
     # Checking if the user has an old socket
-    # if (data["oldsid"] != ""){
-    #     users[data["sid"]] = 
-    # }
-    users.add[data["sid"]] = data["username"]
-    responses[data["sid"]] = []
+    if (data["oldsid"] != ""):
+        users[data["sid"]] = users[data["oldsid"]]
+        del users[data["oldsid"]]
+        responses[data["sid"]] = responses[data["oldsid"]]
+        del responses[data["oldsid"]]
+    
+    else:
+        users[data["sid"]] = data["username"]
+        responses[data["sid"]] = []
+    
     
     if data["username"] == "admin":
         emit('redirect_to_admin', {'url': '/admin'})
