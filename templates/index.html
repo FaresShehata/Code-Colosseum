@@ -7,16 +7,26 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script type="text/javascript" charset="utf-8">
         var socket = io.connect('http://' + document.domain + ':' + location.port);
+        //var oldsid = sessionStorage["oldsid"];
+        
+        var sid = ""
+        // socket.on('connect', () => {
+        //     //get the id from socket
+        //     sid = socket.id;
+        // });
+   
+
+        socket.emit("update_connection", {"uuid": sessionStorage["uuid"]});
         // The rest of the client-side code remains the same
 
-        function sendMessage() {
-            var input = document.getElementById("messageInput");
-            var message = input.value;
-            input.value = ''; // Clear the input field
-
-            // Send message to server
-            socket.emit('message_from_client', {'sid': socket.id, 'answer': message});
-        }
+        // function sendMessage() {
+        //     var input = document.getElementById("messageInput");
+        //     var message = input.value;
+        //     input.value = ''; // Clear the input field
+        //     console.log("Here");
+        //     // Send message to server
+        //     socket.emit('message_from_client', {'sid': socket.id, 'answer': message});
+        // }
 
         socket.on('present_question', function(msg) {
             var messages = document.getElementById("messages");
@@ -31,6 +41,9 @@
             localStorage["username"] = username;     
             window.location.href = "/displayResultsPlayer";
         });
+        socket.on("receive_feedback", function(data) {
+            response = data// TOOD display the feedbakc nicely
+        })
     </script>
     
 </head>
@@ -76,7 +89,9 @@
             editor.setValue(""); // Clear the input field
             
             // Send message to server
-            socket.emit('message_from_client', {'username': 'User', 'text': input});
+            console.log("Here");
+            // Send message to server
+            socket.emit('message_from_client', {'uuid': sessionStorage["uuid"], 'answer': message});
         }
         
         </script>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, request
 from flask_socketio import SocketIO, send, emit
 from testCase import testCase
 from threading import Timer
@@ -48,31 +48,43 @@ def handle_client_message(data):
     t.code = data["answer"]
 
     res = str(t.returnMessage())
-    print(f'Message from {users[data["sid"]]}: {data["answer"]}')
+    print(f'Message from {users[data["uuid"]]}: {data["answer"]}')
     print(f'Output: {res}')
-    responses[data["sid"]] = res
+    responses[data["uuid"]] = res
     if received_responses == len(users):
         handle_question_end()
     # Broadcast the received message with the username
     #emit('present_question', {'username': username, 'text': res})
-
+@socketio.on("connect")
+def handle_connection():
+    pass
+    
 @socketio.on('set_username')
 def handle_set_username(data):
-    # Checking if the user has an old socket
-    if (data["oldsid"] != ""):
-        users[data["sid"]] = users[data["oldsid"]]
-        del users[data["oldsid"]]
-        responses[data["sid"]] = responses[data["oldsid"]]
-        del responses[data["oldsid"]]
-    
+    print("--------------------", request.sid)
+    id = request.sid
+    #print("++++++++++++++", request.namespace.socket.sessid)
+    # Check if the user is in users
+    if data["uuid"] in users:
+        pass
     else:
-        users[data["sid"]] = data["username"]
-        responses[data["sid"]] = []
+        users[data["uuid"]] = [data["username"], id]
+    # Checking if the user has an old socket
+    # if (data["oldsid"] != ""):
+    #     handle_update_connection(data)
     
+    # else:
+    #     users[data["sid"]] = data["username"]
+    #     responses[data["sid"]] = []
     
     if data["username"] == "admin":
         emit('redirect_to_admin', {'url': '/admin'})
 
+
+@socketio.on("update_connection")
+def handle_update_connection(data):
+    users[data["uuid"]] = request.sid
+    
 @socketio.on("set_game_code")
 def handle_set_game_code(data):
     game_code = data["game_code"]
@@ -105,7 +117,7 @@ def handle_question_end():
         socketio.to(key).emit("receive_feedback", responses[key])
     # Next question
     display_next_question()
-    
+
 if __name__ == '__main__':
     socketio.run(app, debug=True)
     

@@ -4,14 +4,15 @@
     <title>Waiting</title>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script type="text/javascript" charset="utf-8">
+        let uuid = crypto.randomUUID();
         var socket = io.connect('http://' + document.domain + ':' + location.port);
         var username = prompt("Enter your username:");
-        var oldsid = "";
-        if ("oldsid" in sessionStorage){
-            oldsid = sessionStorage["oldsid"];
-        }
-        socket.emit('set_username', {"sid":socket.id, 'username': username, "oldsid": oldsid});
-        sessionStorage["oldside"] = socket.id;
+
+        //let myuuid = uuidv4();
+        sessionStorage["uuid"] = uuid;
+        //console.log("sid", sid, "oldsid", oldsid);
+        socket.emit('set_username', {"uuid":uuid, 'username': username});
+        
         socket.on('redirect_to_admin', function(data) {
             // Redirect the client to the specified URL
             window.location.href = data.url;
