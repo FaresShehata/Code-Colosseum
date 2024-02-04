@@ -4,7 +4,6 @@ from testCase import testCase
 from threading import Timer
 
 users = {}
-game_code = None
 responses = {}
 received_responses = [0]
 timingThread = [None]
@@ -12,10 +11,6 @@ timingThread = [None]
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
-
-users = {}
-game_code = None
-responses = {}
 
 questions = [
     testCase("add", [
@@ -42,13 +37,8 @@ def waiting():
 def display_results_player():
     return render_template('displayResultsPlayer.html')
 
-
-
 @socketio.on('message_from_client')
 def handle_client_message(data):
-    # username = users.get(request.sid, 'Unknown User')
-    #username = message['username']
-    #text = message['text']
     t = questions[1]
     t.code = data["answer"]
 
@@ -68,7 +58,7 @@ def handle_connection():
     
 @socketio.on('set_username')
 def handle_set_username(data):
-    print("--------------------", request.sid)
+    # print("--------------------", request.sid)
     id = request.sid
     #print("++++++++++++++", request.namespace.socket.sessid)
     # Check if the user is in users
@@ -92,12 +82,6 @@ def handle_set_username(data):
 def handle_update_connection(data):
     users[data["uuid"]][1] = request.sid
     
-@socketio.on("set_game_code")
-def handle_set_game_code(data):
-    game_code = data["game_code"]
-    # Wait for the host to start the game
-    # TODO start the game
-
 @socketio.on("start_game")
 def handle_start_game():
     # Display question for all players.
