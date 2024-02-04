@@ -4,7 +4,6 @@ from src.testCase import testCase
 from threading import Timer
 
 users = {}
-responses = {}
 wait_for_this_many_users = 2
 current_question = 0
 
@@ -14,12 +13,23 @@ socketio = SocketIO(app)
 
 questions = [
     testCase("add", [
-        ([1,2],3)
+        ([1, 2], 3)
     ], description="make a function 'add' to add 2 numbers"),
     testCase("factorial", [
-        [[5],120], [[6],720]
-    ], description="write a function 'factorial' to calculate the factorial of a number")
+        ([5], 120), ([6], 720)
+    ], description="write a function 'factorial' to calculate the factorial of a number"),
+    testCase("sum_array", [
+        ([1, 2, 3, 4, 5], 15), ([10, 20, 30], 60)
+    ], description="write a function 'sum_array' that returns the sum of all elements in an array"),
+    testCase("is_prime", [
+        ([2], True), ([4], False), ([11], True)
+    ], description="write a function 'is_prime' to check if a number is prime"),
+    testCase("fibonacci", [
+        ([5], 5), ([7], 13)
+    ], description="write a function 'fibonacci' that returns the nth number in the Fibonacci sequence")
 ]
+
+responses: list[dict[str, str]] = [{} for _ in range(len(questions))]
 
 @app.route('/')
 def index():
@@ -37,6 +47,14 @@ def waiting():
 def display_results_player():
     return render_template('displayResultsPlayer.html')
 
+@app.route('/displayResultsAdmin')
+def display_results_admin():
+    return render_template('displayResultsAdmin.html')
+
+def end():
+    emit('end', {"url": "/displayResultsPlayer"}, broadcast=True)
+    emit("end_admin", {"url": "/displayResultsAdmin"}, broadcast=True)
+
 @socketio.on('message_from_client')
 def handle_client_message(data):
     t = questions[current_question]
@@ -45,12 +63,14 @@ def handle_client_message(data):
     res = t.returnMessage()
     print(f'Message from {users[data["uuid"]][0]}: {data["answer"]}')
     print(f'Output: {res["ret"]}')
-    responses[users[data["uuid"]][0]] = res
+    # responses[users[data["uuid"]][current_question]] = res
+    responses[current_question][users[data["uuid"]][1]] = res
 
-    if len(responses) == wait_for_this_many_users:
+    if len(responses[current_question]) == len(users):
         handle_question_end()
     # Broadcast the received message with the username
     #emit('present_question', {'username': username, 'text': res})
+
 @socketio.on("connect")
 def handle_connection():
     pass
@@ -87,12 +107,14 @@ def handle_start_game():
     emit('redirect_to_question', {'url': '/question'}, broadcast=True)
 
 def display_next_question():
-    question = ""
-    for key in responses:
-        responses[key] = None
+    # for key in responses:
+    #     responses[key] = None
     # TODO get the question
     # Emit the question to all clients
-    emit("new_question", question, broadcast=True)
+    msg = {
+        "description": questions[current_question].description
+    }
+    emit("new_question", msg, broadcast=True)
 
 # Handles when all responses have been received or timeout occurs
 def handle_question_end():
@@ -102,6 +124,14 @@ def handle_question_end():
     # # Next question
     # display_next_question()
     print("Everyone has responded with their shit.")
+    global current_question
+    current_question += 1
+    if current_question < len(questions):
+        display_next_question()
+    else:
+        # todo dislpay results
+        current_question = 0
+        end()
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

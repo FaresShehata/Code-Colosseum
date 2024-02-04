@@ -30,6 +30,26 @@
             response = data;// TOOD display the feedbakc nicely
             document.getElementById("messages").innerHTML = response;
         })
+        socket.on("new_question", function(msg) {
+            let desc = msg.description
+            
+            document.getElementById('prompt').style.display = "block";
+            document.getElementById('ask').style.display = "block";
+            document.getElementById('button').style.display = "block";            
+
+            document.getElementById('editor').style.display = "block";
+        
+            document.getElementById('loader').style.display = "none";
+
+            var button = document.getElementById('button');
+            button.disabled = false;
+
+            document.getElementById("ask").innerText = "Question: " + desc;
+
+        })
+        socket.on("end", function(data) {
+            window.location.href = data.url;
+        })
     </script>
     
 </head>
@@ -48,8 +68,8 @@
             <label id="prompt" for="code" class="block text-sm font-medium leading-6 text-gray-900">Enter your code below</label>
             <div class="relative mt-2 rounded-md shadow-sm">
                 <div id="block">
-                <div id="editor" style="height: 300px;"></div>
-                </div>
+                    <div id="loader" style="display: none;"></div>
+                    <div id="editor" style="height: 300px;"></div>
                 </div>
         
             <button id="button" onclick="sendMessage()" class="mt-4 px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Send</button>
@@ -62,7 +82,7 @@
         editor.setTheme("ace/theme/monokai"); // Set editor theme
         editor.session.setMode("ace/mode/python"); // Set language mode
         editor.session.setUseWrapMode(true);    
-        editor.setHighlightActiveLine(false);
+        editor.setHighlightActiveLine(true);
         // Add event listener for changes in the editor
         editor.getSession().on('change', function() {
             var code = editor.getValue();
@@ -71,27 +91,28 @@
         function sendMessage() {
             var blob = document.getElementById('blob');
             blob.style.animationPlayState = 'paused';
-            document.getElementById('card').remove();
-            document.getElementById('prompt').remove();
-            document.getElementById('ask').remove();
-            document.getElementById('button').remove();            
+            document.getElementById('card').style.display = "none";
+            document.getElementById('prompt').style.display = "none";
+            document.getElementById('ask').style.display = "none";
+            document.getElementById('button').style.display = "none";            
 
             
             var input = editor.getValue();
             var message = input;
-            editor.destroy();
-            editor.container.remove();
+            // editor.destroy();
+            // editor.container.remove();
+            editor.setValue("");
+            document.getElementById('editor').style.display = "none";
 
             // Clear the input field
             
             // Send message to server
             socket.emit('message_from_client', {'uuid': sessionStorage["uuid"], 'answer': message});
 
-            var loaderDiv = document.createElement('div');
-            loaderDiv.setAttribute('id', 'loader');
+            document.getElementById('loader').style.display = "block";
 
-            var coderDiv = document.getElementById('block');
-            coderDiv.appendChild(loaderDiv);
+            // var coderDiv = document.getElementById('block');
+            // coderDiv.appendChild(loaderDiv);
 
             var button = document.getElementById('button');
             button.disabled = true;
