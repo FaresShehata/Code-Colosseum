@@ -44,6 +44,7 @@ def handle_client_message(message):
 
     res = str(t.returnMessage())
     print(f'Message from {username}: {text}')
+
     print(f'Output: {res}')
     # Broadcast the received message with the username
     emit('present_question', {'username': username, 'text': res}, room=request.sid)

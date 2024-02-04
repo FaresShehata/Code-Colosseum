@@ -16,7 +16,7 @@
   /* 2 */
   border-style: solid;
   /* 2 */
-  border-color: #e5e7eb;
+  border-color: #EEEEEE;
   /* 2 */
 }
 
@@ -622,7 +622,7 @@ video {
 }
 
 .rounded-lg {
-  border-radius: 0.5rem;
+  border-radius: 2rem;
 }
 
 .rounded-md {

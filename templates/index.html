@@ -21,7 +21,7 @@
 
         socket.on('present_question', function(msg) {
             var messages = document.getElementById("messages");
-            messages.innerHTML += ('<p><b>' + msg.username + ':</b> ' + msg.text + '</p>');
+            //messages.innerHTML += ('<p><b>' + msg.username + ':</b> ' + msg.text + '</p>');
         });
         socket.on("display_round_results", function(data) {
             //TODO display how the user did on this particular question here
@@ -44,7 +44,7 @@
 
     <div class="flex flex-col justify-center min-h-screen bg-gray-50 py-6 sm:py-12 w-fill">
         <div class="relative bg-white rounded-lg shadow-xl ring-1 ring-gray-900/5 mx-auto max-w-lg px-6 pt-10 pb-8 sm:px-10 space-y-6 text-base leading-7 text-gray-600 md:w-3/4">
-          <h2 class="center text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Question:</h2>
+          <h2 id="ask" class="center text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Question:</h2>
           <div id="messages" class="mb-20"></div>
           <div>
             <label id="prompt" for="code" class="block text-sm font-medium leading-6 text-gray-900">Enter your code below</label>
@@ -75,6 +75,8 @@
             blob.style.animationPlayState = 'paused';
             document.getElementById('card').remove();
             document.getElementById('prompt').remove();
+            document.getElementById('ask').remove();
+            document.getElementById('button').remove();            
 
             
             var input = editor.getValue();

@@ -1,6 +1,6 @@
 #editor {
     width: 100%;
-    border: 1px solid #ccc;
+    border: 1px solid #EEEEEE;
     border-radius: 5px;
     margin-bottom: 20px;
 }
@@ -109,6 +109,7 @@
   animation: spin 2s linear infinite;
   position: relative;
   margin-left: 150px;
+  margin-bottom: 100px;
 }
 
 @keyframes spin {
