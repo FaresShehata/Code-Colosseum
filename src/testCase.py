@@ -1,19 +1,19 @@
-code = """
-def add(x, y):
-    return x - y
-"""
+import re
+from typing import Any
 
 class testCase:
     def __init__(self, funName, tests, code="", description=""):
         self.funcName = funName
-        self.tests = tests # list of tuples. first is list of args, second is desired output
+        self.tests = tests # list of tuples. first is list of args, second is desired output.
         self.code = code
         self.description = description
+
     def getArgs(self, index):
         cur = str(self.tests[index][0][0])
         for i in range(1, len(self.tests[index][0])):
             cur += f", {self.tests[index][0][i]}"
         return cur
+    
     def generateCode(self):
         cur = """
 ret = ""
@@ -37,11 +37,26 @@ except Exception as e:
         """
         return self.code + cur
         
-    def returnMessage(self):
+    def getFailedMessage(self):
+        failure_message = "Your code did not compile/run."
+        return failure_message
+    
+    def returnMessage(self) -> dict[str, Any]:
         loc = {}
+
         try:
             exec(self.generateCode(), loc, loc)
-        except Exception as e:
-            loc["ret"] = str(e)
-        retValue = loc["ret"]
-        return retValue
+            # This is horrible.
+            pattern = re.compile(r"passed (\d+)/(\d+) test cases")
+            match = pattern.search(loc["ret"])
+
+            try:
+                loc["percentage"] = (int(match.group(1))/int(match.group(2))) * 100
+            except Exception as e:
+                print(f"The following went wrong with extracting test statistics: {e}")
+
+        except Exception as ee:
+            print(ee)
+            loc["ret"] = self.getFailedMessage()
+        
+        return loc
