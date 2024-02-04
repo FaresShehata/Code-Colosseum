@@ -10,6 +10,7 @@ socketio = SocketIO(app)
 users = {}
 game_code = None
 responses = {}
+received_responses = 0
 timingThread = None
 questions = [
     testCase("add", [
@@ -39,18 +40,21 @@ def display_results_player():
 
 
 @socketio.on('message_from_client')
-def handle_client_message(message):
+def handle_client_message(data):
     # username = users.get(request.sid, 'Unknown User')
-    username = message['username']
-    text = message['text']
+    #username = message['username']
+    #text = message['text']
     t = questions[1]
-    t.code = text
+    t.code = data["answer"]
 
     res = str(t.returnMessage())
-    print(f'Message from {username}: {text}')
+    print(f'Message from {users[data["sid"]]}: {data["answer"]}')
     print(f'Output: {res}')
+    responses[data["sid"]] = res
+    if received_responses == len(users):
+        handle_question_end()
     # Broadcast the received message with the username
-    emit('present_question', {'username': username, 'text': res})
+    #emit('present_question', {'username': username, 'text': res})
 
 @socketio.on('set_username')
 def handle_set_username(data):
@@ -82,16 +86,26 @@ def handle_start_game():
 
 def display_next_question():
     question = ""
+    for key in responses:
+        responses[key] = None
+    received_responses = 0
     # TODO get the question
     # Emit the question to all clients
     socketio.broadcast.emit("new_question", question)
     # Start the timer
     question_time = 60 
-    timingThread = threading.Timer(question_time, on_response_timeout)
+    timingThread = Timer(question_time, handle_question_end)
+    timingThread.start()
 
-def on_response_timeout():
-    pass
-
+# Handles when all responses have been received or timeout occurs
+def handle_question_end():
+    timingThread.cancel()
+    # Send the feedback to all the users
+    for key in responses:
+        socketio.to(key).emit("receive_feedback", responses[key])
+    # Next question
+    display_next_question()
+    
 if __name__ == '__main__':
     socketio.run(app, debug=True)
     
