@@ -5,10 +5,13 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script type="text/javascript" charset="utf-8">
         var socket = io.connect('http://' + document.domain + ':' + location.port);
-
         var username = prompt("Enter your username:");
-        socket.emit('set_username', {'username': username});
-
+        var oldsid = "";
+        if ("oldsid" in sessionStorage){
+            oldsid = sessionStorage["oldsid"];
+        }
+        socket.emit('set_username', {"sid":socket.id, 'username': username, "oldsid": oldsid});
+        sessionStorage["oldside"] = socket.id;
         socket.on('redirect_to_admin', function(data) {
             // Redirect the client to the specified URL
             window.location.href = data.url;

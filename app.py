@@ -37,7 +37,8 @@ def display_results_player():
 
 @socketio.on('message_from_client')
 def handle_client_message(message):
-    username = users.get(request.sid, 'Unknown User')
+    # username = users.get(request.sid, 'Unknown User')
+    username = message['username']
     text = message['text']
     t = questions[1]
     t.code = text
@@ -46,15 +47,19 @@ def handle_client_message(message):
     print(f'Message from {username}: {text}')
     print(f'Output: {res}')
     # Broadcast the received message with the username
-    emit('present_question', {'username': username, 'text': res}, room=request.sid)
+    emit('present_question', {'username': username, 'text': res})
 
 @socketio.on('set_username')
 def handle_set_username(data):
-    username = data['username']
-    if username == "admin":
+    # Checking if the user has an old socket
+    # if (data["oldsid"] != ""){
+    #     users[data["sid"]] = 
+    # }
+    users.add[data["sid"]] = data["username"]
+    responses[data["sid"]] = []
+    
+    if data["username"] == "admin":
         emit('redirect_to_admin', {'url': '/admin'})
-    else:
-        users[request.sid] = username
 
 @socketio.on("set_game_code")
 def handle_set_game_code(data):
