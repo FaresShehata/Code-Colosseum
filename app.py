@@ -134,7 +134,6 @@ def handle_question_end():
     #     emit("receive_feedback", responses[key], to=users[key][1])
     # # Next question
     # display_next_question()
-    print("Everyone has responded with their shit.")
     global current_question
     current_question += 1
     if current_question < len(questions):
@@ -145,5 +144,5 @@ def handle_question_end():
         end()
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, host="0.0.0.0", debug=True)
     
