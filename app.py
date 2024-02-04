@@ -3,15 +3,17 @@ from flask_socketio import SocketIO, send, emit
 from testCase import testCase
 from threading import Timer
 
+users = {}
+game_code = None
+responses = {}
+received_responses = [0]
+timingThread = [None]
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
-users = {}
-game_code = None
-responses = {}
-received_responses = 0
-timingThread = None
+
 questions = [
     testCase("add", [
         ([1,2],3)
@@ -48,10 +50,12 @@ def handle_client_message(data):
     t.code = data["answer"]
 
     res = str(t.returnMessage())
-    print(f'Message from {users[data["uuid"]]}: {data["answer"]}')
+    print(f'Message from {users[data["uuid"]][0]}: {data["answer"]}')
     print(f'Output: {res}')
     responses[data["uuid"]] = res
-    if received_responses == len(users):
+    received_responses[0] += 1
+    print(received_responses[0], len(users))
+    if received_responses[0] >= len(users):
         handle_question_end()
     # Broadcast the received message with the username
     #emit('present_question', {'username': username, 'text': res})
@@ -67,7 +71,7 @@ def handle_set_username(data):
     # Check if the user is in users
     if data["uuid"] in users:
         pass
-    else:
+    elif data["username"] != "admin":
         users[data["uuid"]] = [data["username"], id]
     # Checking if the user has an old socket
     # if (data["oldsid"] != ""):
@@ -83,7 +87,7 @@ def handle_set_username(data):
 
 @socketio.on("update_connection")
 def handle_update_connection(data):
-    users[data["uuid"]] = request.sid
+    users[data["uuid"]][1] = request.sid
     
 @socketio.on("set_game_code")
 def handle_set_game_code(data):
@@ -103,18 +107,19 @@ def display_next_question():
     received_responses = 0
     # TODO get the question
     # Emit the question to all clients
-    socketio.broadcast.emit("new_question", question)
+    emit("new_question", question, broadcast=True)
     # Start the timer
-    question_time = 60 
-    timingThread = Timer(question_time, handle_question_end)
-    timingThread.start()
+    question_time = 60 * 5
+    timingThread[0] = Timer(question_time, handle_question_end)
+    timingThread[0].start()
 
 # Handles when all responses have been received or timeout occurs
 def handle_question_end():
-    timingThread.cancel()
+    if timingThread[0] is not None: 
+        timingThread[0].cancel()
     # Send the feedback to all the users
     for key in responses:
-        socketio.to(key).emit("receive_feedback", responses[key])
+        emit("receive_feedback", responses[key], to=users[key][1])
     # Next question
     display_next_question()
 

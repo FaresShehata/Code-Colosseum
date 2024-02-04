@@ -42,7 +42,9 @@
             window.location.href = "/displayResultsPlayer";
         });
         socket.on("receive_feedback", function(data) {
-            response = data// TOOD display the feedbakc nicely
+            console.log(data);
+            response = data;// TOOD display the feedbakc nicely
+            document.getElementById("messages").innerHTML = response;
         })
     </script>
     
@@ -73,7 +75,7 @@
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/monokai"); // Set editor theme
         editor.session.setMode("ace/mode/python"); // Set language mode
-        editor.session.setUseWrapMode(true);
+        editor.session.setUseWrapMode(true);    
         editor.setHighlightActiveLine(false);
         // Add event listener for changes in the editor
         editor.getSession().on('change', function() {
@@ -88,8 +90,6 @@
             var message = input;
             editor.setValue(""); // Clear the input field
             
-            // Send message to server
-            console.log("Here");
             // Send message to server
             socket.emit('message_from_client', {'uuid': sessionStorage["uuid"], 'answer': message});
         }
