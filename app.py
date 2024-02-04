@@ -1,12 +1,20 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, request
 from flask_socketio import SocketIO, send, emit
 from testCase import testCase
+from threading import Timer
+
+users = {}
+game_code = None
+responses = {}
+received_responses = [0]
+timingThread = [None]
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
 users = {}
+game_code = None
 responses = {}
 
 questions = [
@@ -34,40 +42,61 @@ def waiting():
 def display_results_player():
     return render_template('displayResultsPlayer.html')
 
+
+
 @socketio.on('message_from_client')
-def handle_client_message(message):
+def handle_client_message(data):
     # username = users.get(request.sid, 'Unknown User')
-    username = message['username']
-    text = message['text']
+    #username = message['username']
+    #text = message['text']
     t = questions[1]
-    t.code = text
+    t.code = data["answer"]
 
     res = str(t.returnMessage())
-    print(f'Message from {username}: {text}')
-
+    print(f'Message from {users[data["uuid"]][0]}: {data["answer"]}')
     print(f'Output: {res}')
-    responses[request.sid] = res
-    if len(responses) == 2:
-        # Send the received message with the username
-        for sid in responses:
-            emit('present_question', {'text': responses[sid]}, to=sid)
-
+    responses[data["uuid"]] = res
+    received_responses[0] += 1
+    print(received_responses[0], len(users))
+    if received_responses[0] >= len(users):
+        handle_question_end()
+    # Broadcast the received message with the username
+    #emit('present_question', {'username': username, 'text': res})
+@socketio.on("connect")
+def handle_connection():
+    pass
+    
 @socketio.on('set_username')
 def handle_set_username(data):
+    print("--------------------", request.sid)
+    id = request.sid
+    #print("++++++++++++++", request.namespace.socket.sessid)
+    # Check if the user is in users
+    if data["uuid"] in users:
+        pass
+    elif data["username"] != "admin":
+        users[data["uuid"]] = [data["username"], id]
     # Checking if the user has an old socket
-    if (data["oldsid"] != ""):
-        users[data["sid"]] = users[data["oldsid"]]
-        del users[data["oldsid"]]
-        responses[data["sid"]] = responses[data["oldsid"]]
-        del responses[data["oldsid"]]
+    # if (data["oldsid"] != ""):
+    #     handle_update_connection(data)
     
-    else:
-        users[data["sid"]] = data["username"]
-        responses[data["sid"]] = []
-    
+    # else:
+    #     users[data["sid"]] = data["username"]
+    #     responses[data["sid"]] = []
     
     if data["username"] == "admin":
         emit('redirect_to_admin', {'url': '/admin'})
+
+
+@socketio.on("update_connection")
+def handle_update_connection(data):
+    users[data["uuid"]][1] = request.sid
+    
+@socketio.on("set_game_code")
+def handle_set_game_code(data):
+    game_code = data["game_code"]
+    # Wait for the host to start the game
+    # TODO start the game
 
 @socketio.on("start_game")
 def handle_start_game():
@@ -76,10 +105,27 @@ def handle_start_game():
 
 def display_next_question():
     question = ""
+    for key in responses:
+        responses[key] = None
+    received_responses = 0
     # TODO get the question
     # Emit the question to all clients
-    socketio.broadcast.emit("new_question", question)
-    
+    emit("new_question", question, broadcast=True)
+    # Start the timer
+    question_time = 60 * 5
+    timingThread[0] = Timer(question_time, handle_question_end)
+    timingThread[0].start()
+
+# Handles when all responses have been received or timeout occurs
+def handle_question_end():
+    if timingThread[0] is not None: 
+        timingThread[0].cancel()
+    # Send the feedback to all the users
+    for key in responses:
+        emit("receive_feedback", responses[key], to=users[key][1])
+    # Next question
+    display_next_question()
+
 if __name__ == '__main__':
     socketio.run(app, debug=True)
     

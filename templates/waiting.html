@@ -5,11 +5,15 @@
     <link href="{{ url_for('static',filename='styles/others.css') }}" rel="stylesheet"><link href="{{ url_for('static',filename='styles/index.css') }}" rel="stylesheet">
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script type="text/javascript" charset="utf-8">
+        let uuid = crypto.randomUUID();
         var socket = io.connect('http://' + document.domain + ':' + location.port);
         var username = prompt("Enter your username:");
-        sessionStorage['username'] = username;
-        socket.emit('set_username', {'username': username});
 
+        //let myuuid = uuidv4();
+        sessionStorage["uuid"] = uuid;
+        //console.log("sid", sid, "oldsid", oldsid);
+        socket.emit('set_username', {"uuid":uuid, 'username': username});
+        
         socket.on('redirect_to_admin', function(data) {
             // Redirect the client to the specified URL
             window.location.href = data.url;

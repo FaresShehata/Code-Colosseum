@@ -8,6 +8,16 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script type="text/javascript" charset="utf-8">
         var socket = io.connect('http://' + document.domain + ':' + location.port);
+        //var oldsid = sessionStorage["oldsid"];
+        
+        var sid = ""
+        // socket.on('connect', () => {
+        //     //get the id from socket
+        //     sid = socket.id;
+        // });
+   
+
+        socket.emit("update_connection", {"uuid": sessionStorage["uuid"]});
         // The rest of the client-side code remains the same
 
         socket.on('present_question', function(msg) {
@@ -23,6 +33,11 @@
             localStorage["username"] = username;     
             window.location.href = "/displayResultsPlayer";
         });
+        socket.on("receive_feedback", function(data) {
+            console.log(data);
+            response = data;// TOOD display the feedbakc nicely
+            document.getElementById("messages").innerHTML = response;
+        })
     </script>
     
 </head>
@@ -54,7 +69,7 @@
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/monokai"); // Set editor theme
         editor.session.setMode("ace/mode/python"); // Set language mode
-        editor.session.setUseWrapMode(true);
+        editor.session.setUseWrapMode(true);    
         editor.setHighlightActiveLine(false);
         // Add event listener for changes in the editor
         editor.getSession().on('change', function() {
@@ -78,8 +93,8 @@
             // Clear the input field
             
             // Send message to server
-            socket.emit('message_from_client', {'username': sessionStorage.getItem('username'), 'text': input});
-            
+            socket.emit('message_from_client', {'uuid': sessionStorage["uuid"], 'answer': message});
+
             var loaderDiv = document.createElement('div');
             loaderDiv.setAttribute('id', 'loader');
 
