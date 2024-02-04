@@ -817,3 +817,48 @@ video {
     width: 25%;
   }
 }
+
+
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.box_results {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 20px; /* Adjust padding as needed */
+  font-size: 1.25rem; /* Adjust font size as needed */
+  line-height: 1.5; /* Adjust line height as needed */
+  color: #4b5563; /* Adjust text color as needed */
+}
+
+.names {
+  width: 20%; /* Adjust width of the Names box */
+  height: 250px; /* Adjust height of the Names box */
+}
+
+.scores {
+  width: 75%; /* Adjust width of the Scores box */
+  height: 250px; /* Adjust height of the Scores box */
+}
+
+@media (max-width: 768px) {
+  .flex-container {
+      flex-direction: column;
+  }
+
+  .box_results {
+      width: 100%;
+      margin-bottom: 20px; /* Adjust margin between boxes */
+  }
+
+  .names,
+  .scores {
+      width: 100%;
+      height: auto; /* Adjust height for smaller screens */
+  }
+}

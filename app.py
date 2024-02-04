@@ -48,8 +48,8 @@ def handle_client_message(data):
     print(f'Output: {res}')
     responses[data["uuid"]] = res
     received_responses[0] += 1
-    required_responses = 2
-    if received_responses[0] >= required_responses:
+    print(received_responses[0], len(users))
+    if received_responses[0] >= len(users):
         handle_question_end()
     # Broadcast the received message with the username
     #emit('present_question', {'username': username, 'text': res})
@@ -113,6 +113,8 @@ def handle_question_end():
         emit("receive_feedback", responses[key], to=users[key][1])
     # Next question
     display_next_question()
+    #emit('redirect_to_result_page', {'url': '/displayResultsPlayer'}, broadcast=True)
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

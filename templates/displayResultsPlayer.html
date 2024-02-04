@@ -1,9 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Results</title>
+    <link href="{{ url_for('static',filename='styles/others.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static',filename='styles/index.css') }}" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="text/javascript" charset="utf-8">
+    
+
         var socket = io.connect('http://' + document.domain + ':' + location.port);
         socket.emit('set_username', {'username': localStorage["username"]});
 
@@ -19,8 +27,81 @@
         });
     </script>
 </head>
+
 <body onload="displayResults()">
-    <h1>The results</h1>
-    <div id="results"></div>
+    <div class="flex-container bg-gray-50 py-6 sm:py-12 w-fill">
+        <div class="box_results names">
+            <h2 class="center text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl" style="text-align: center;">Names:</h2>
+            <div class="mb-20"></div>
+            <div>
+                <div class="relative mt-2 rounded-md shadow-sm">
+                </div>
+            </div>
+        </div>
+    
+        <div class="box_results scores">
+            <h2 class="center text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl" style="text-align: center;">Scores:</h2>
+            <div class="mb-20"></div>
+            <div>
+                <div class="relative mt-2 rounded-md shadow-sm">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="horizontal-bar-chart-container" style="width: 700px; height: 400PX; margin-left: 350PX;">
+        <canvas id="horizontal-bar-chart" width="300" height="200"></canvas>
+      </div>    
+    
+      <script type="text/javascript" charset="utf-8">
+        
+        function sendMessage() {
+            
+            var input = editor.getValue();
+            var message = input;
+            editor.destroy();
+            editor.container.remove();
+
+            // Clear the input field
+            
+            // Send message to server
+            socket.emit('message_from_client', {'uuid': sessionStorage["uuid"], 'answer': message});
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+        var ctx = document.getElementById('horizontal-bar-chart').getContext('2d');
+
+        var data = {
+            labels: ['Label 1', 'Label 2', 'Label 3', 'Label 4', 'Label 5'],
+            values: [20, 30, 15, 25, 35] // Sample values, you can replace these with your actual data
+        };
+
+        var chart = new Chart(ctx, {
+            type: 'bar', // Keep this as 'bar'
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'Values',
+                    data: data.values,
+                    backgroundColor: 'rgba(33, 99, 154, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y', // This makes the bar chart horizontal
+                scales: {
+                    xAxes: [{ // Note: For Chart.js version 3.x, it's 'x' instead of 'xAxes'
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                responsive: true, // Make the chart responsive
+                maintainAspectRatio: false, // Allow the chart to adjust its size
+            }
+        });
+    });
+   </script>
 </body>
 </html>
